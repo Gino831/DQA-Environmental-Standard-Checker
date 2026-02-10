@@ -1269,19 +1269,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.warn('[SYNC] Failed to sync data.js:', syncResult.message);
                     }
                 } catch (syncError) {
-                    console.warn('[SYNC] Could not sync to data.js before verification:', syncError);
+                    console.warn('[SYNC] 無法同步到 data.js (GitHub Pages 模式):', syncError.message);
                 }
 
-                // 1. Trigger Python Script via Server
-                const runResponse = await fetch('/api/run-verify', { method: 'POST' });
-                if (runResponse.ok) {
-                    const runResult = await runResponse.json();
-                    if (runResult.status !== 'success') {
-                        console.warn('Script warning:', runResult.message);
-                        // Continue anyway to try loading report
+                // 1. Trigger Python Script via Server (本地模式)
+                let serverAvailable = false;
+                try {
+                    const runResponse = await fetch('/api/run-verify', { method: 'POST' });
+                    if (runResponse.ok) {
+                        const runResult = await runResponse.json();
+                        serverAvailable = true;
+                        if (runResult.status !== 'success') {
+                            console.warn('Script warning:', runResult.message);
+                        }
                     }
-                } else {
-                    console.warn('Server API not available, trying to load static report...');
+                } catch (apiError) {
+                    console.log('[MODE] 本地伺服器不可用，使用 GitHub Pages 靜態模式');
                 }
 
                 // 2. Load the generated JSON report

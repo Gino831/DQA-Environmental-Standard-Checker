@@ -1,0 +1,61 @@
+# 定時執行爬蟲驗證標準版本
+# 此工作流程會定期檢查所有法規標準的最新版本
+
+name: 🔄 定時爬蟲驗證
+
+on:
+  # 每週一早上 9 點 (UTC+8) 自動執行
+  schedule:
+    - cron: '0 1 * * 1'
+  
+  # 允許手動觸發（從 GitHub Actions 頁面或 API）
+  workflow_dispatch:
+
+  # 當 data.js 被推送時也執行
+  push:
+    paths:
+      - 'data.js'
+
+# 設定寫入權限，允許 Actions 推送更新結果
+permissions:
+  contents: write
+
+jobs:
+  verify-standards:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. 拉取程式碼
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      # 2. 設定 Python 環境
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+      
+      # 3. 安裝 Chrome（Selenium 需要）
+      - name: 🌐 Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 'stable'
+
+      # 4. 安裝 Python 依賴
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      # 5. 執行爬蟲驗證
+      - name: 🔍 Run verification
+        run: python verify_standards.py
+
+      # 6. 將結果推送回 repo
+      - name: 📤 Commit & push results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add verification_results.json
+          # 只在有變更時才 commit
+          git diff --staged --quiet || git commit -m "🔄 自動更新驗證結果 $(date +'%Y-%m-%d %H:%M')"
+          git push
