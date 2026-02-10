@@ -1330,6 +1330,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     const match = issue.match(/Live='(.*?)'/);
                                     if (match) newVersion = match[1];
                                 }
+                                // 智能爬蟲產生的 Version 格式 (e.g., "Version: Local='issue 3' vs Live='Issue 4'")
+                                if (issue.includes('Version:')) {
+                                    const match = issue.match(/Live='(.*?)'/);
+                                    if (match) newVersion = match[1];
+                                }
                             });
 
                             // Check if there are actual changes compared to localStorage
@@ -1386,6 +1391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         'Stability': '穩定性',
                                         'Date': '日期',
                                         'Edition': '版本',
+                                        'Version': '版本',
                                         'Cost': '成本'
                                     }[field] || field;
                                     return `<span>${fieldName}: ${localVal} → <b style="color:var(--accent-color);">${liveVal}</b></span>`;
