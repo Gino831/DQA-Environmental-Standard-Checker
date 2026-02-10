@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DQA Environmental Standard Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="background-gradient"></div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-section">
+                <i data-lucide="shield-check" class="logo-icon"></i>
+                <h1>DQA Standard Checker</h1>
+            </div>
+            <button id="add-btn" class="btn-primary">
+                <i data-lucide="plus"></i> Add Standard
+            </button>
+        </header>
+
+        <main>
+            <!-- Dashboard Summary -->
+            <div class="dashboard-summary">
+                <div class="summary-card warning">
+                    <div class="summary-icon">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <div class="summary-info">
+                        <h3>Expiring This Year</h3>
+                        <p id="expiring-count">0</p>
+                    </div>
+                </div>
+                <div class="summary-card info">
+                    <div class="summary-icon">
+                        <i data-lucide="coins"></i>
+                    </div>
+                    <div class="summary-info">
+                        <h3>Est. Upgrade Cost</h3>
+                        <p id="total-cost">CHF 0</p>
+                    </div>
+                </div>
+                <button id="manual-update-btn" class="btn-primary" title="從網站抓取最新資料並更新">
+                    <i data-lucide="refresh-cw"></i> 一鍵更新
+                </button>
+                <button id="reset-data-btn" class="btn-secondary" title="Reset to original data.js (clear localStorage)"
+                    style="background: #dc3545;">
+                    <i data-lucide="rotate-ccw"></i> Reset Data
+                </button>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="controls-section" style="margin-bottom: 1rem;">
+                <div class="search-bar" style="position: relative;">
+                    <i data-lucide="search"
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); width: 18px; height: 18px;"></i>
+                    <input type="text" id="search-input" placeholder="Search standards..."
+                        style="padding-left: 2.5rem;">
+                </div>
+            </div>
+
+            <!-- Standards Table -->
+            <div class="table-container glass-panel">
+                <table id="standards-table">
+                    <thead>
+                        <tr>
+                            <th>Standard Name</th>
+                            <th>Description</th>
+                            <th>Revision Summary</th>
+                            <th>Version</th>
+                            <th>Effective Date</th>
+                            <th>Expiry / Stability</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standards-list">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Standard Modal -->
+    <div id="add-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Standard</h2>
+                <button id="close-modal" class="btn-icon" aria-label="關閉視窗"><i data-lucide="x"></i></button>
+            </div>
+            <form id="add-form">
+                <input type="hidden" id="std-id">
+                <div class="form-group">
+                    <label for="std-category-select">Category</label>
+                    <select id="std-category-select" required>
+                        <option value="MOXA Standard">MOXA Standard</option>
+                        <option value="Marine Standard">Marine Standard</option>
+                        <option value="Railway Standard">Railway Standard</option>
+                        <option value="Power Station">Power Station</option>
+                        <option value="Other">Other / Custom</option>
+                    </select>
+                    <input type="text" id="std-category-custom" placeholder="Enter custom category"
+                        style="display: none; margin-top: 0.5rem;">
+                </div>
+                <div class="form-group">
+                    <label for="std-name">Standard Name</label>
+                    <input type="text" id="std-name" required placeholder="e.g. IEC 60068-2-1">
+                </div>
+                <div class="form-group">
+                    <label for="std-desc">Description/Summary</label>
+                    <input type="text" id="std-desc" placeholder="Environmental testing - Cold">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="std-version">Version</label>
+                        <input type="text" id="std-version" placeholder="Ed. 6.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="std-cost">Cost</label>
+                        <input type="text" id="std-cost" placeholder="CHF 150">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="std-effective">Effective Date</label>
+                        <input type="date" id="std-effective">
+                    </div>
+                    <div class="form-group">
+                        <label for="std-expiry">Expiry Date (Optional)</label>
+                        <input type="date" id="std-expiry">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="std-source-url">Source URL <span
+                            style="color: #f59e0b; font-weight: normal; font-size: 0.85rem;">*一鍵更新必填</span></label>
+                    <input type="url" id="std-source-url" placeholder="https://webstore.iec.ch/en/publication/XXXXX">
+                    <small style="color: #6b7280; font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+                        💡 IEC標準格式: https://webstore.iec.ch/en/publication/XXXXX
+                    </small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Standard</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Updates -->
+    <div id="updates-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Standards Requiring Attention</h2>
+                <button id="close-updates-modal" class="btn-icon" aria-label="關閉視窗"><i data-lucide="x"></i></button>
+            </div>
+            <div id="updates-list" style="max-height: 400px; overflow-y: auto; margin-bottom: 1rem;">
+                <!-- List of expired/expiring standards will be injected here -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="update-confirm-btn" class="btn-primary" style="display: none;">Update
+                    All</button>
+                <button type="button" id="close-updates-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Standard Details -->
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Standard Details</h2>
+                <button id="close-details-modal" class="btn-icon" aria-label="關閉視窗"><i data-lucide="x"></i></button>
+            </div>
+            <div id="details-content">
+                <!-- Details injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AlertDialog for Delete Confirmation -->
+    <div id="delete-confirm-modal" class="modal hidden" role="alertdialog" aria-labelledby="delete-confirm-title"
+        aria-describedby="delete-confirm-desc">
+        <div class="modal-content glass-panel" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="delete-confirm-title">確認刪除</h2>
+            </div>
+            <p id="delete-confirm-desc" style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                您確定要刪除這個法規嗎？此操作無法復原。
+            </p>
+            <div class="modal-actions">
+                <button type="button" id="delete-cancel-btn" class="btn-secondary">取消</button>
+                <button type="button" id="delete-confirm-btn" class="btn-primary"
+                    style="background: var(--danger);">確認刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+{
+  "timestamp": "2026-02-04T15:23:41.884695",
+  "results": [
+    {
+      "id": "std-1770091032381",
+      "name": "Telcordia SR-332",
+      "url": "https://telecom-info.njdepot.ericsson.net/site-cgi/ido/docs.cgi?ID=13515794250D000616&KEYWORDS=Reliability%20Prediction%20Procedures%20&TITLE=&DOCUMENT=&DATE=&CLASS=PS71&COUNT=1000",
+      "status": "MISMATCH",
+      "issues": [
+        "Version: Local='issue 3' vs Live='Issue 4'"
+      ]
+    },
+    {
+      "id": "std-1768206238554",
+      "name": "IEC 60721-3-3",
+      "url": "https://webstore.iec.ch/en/publication/32620",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-1768268975228",
+      "name": "IEC 60721-3-4",
+      "url": "https://webstore.iec.ch/en/publication/61080",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-1768459867462",
+      "name": "IEC 60721-3-5",
+      "url": "https://webstore.iec.ch/en/publication/86315",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-2",
+      "name": "IEC 60068-2-1",
+      "url": "https://webstore.iec.ch/en/publication/82354",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-3",
+      "name": "IEC 60068-2-2",
+      "url": "https://webstore.iec.ch/en/publication/82355",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-4",
+      "name": "IEC 60068-2-6",
+      "url": "https://webstore.iec.ch/en/publication/544",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-5",
+      "name": "IEC 60068-2-13",
+      "url": "https://webstore.iec.ch/en/publication/64534",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-6",
+      "name": "IEC 60068-2-14",
+      "url": "https://webstore.iec.ch/en/publication/71503",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-7",
+      "name": "IEC 60068-2-30",
+      "url": "https://webstore.iec.ch/en/publication/82356",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-8",
+      "name": "IEC 60068-2-52",
+      "url": "https://webstore.iec.ch/en/publication/61926",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-9",
+      "name": "IEC 60068-2-64",
+      "url": "https://webstore.iec.ch/en/publication/65892",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-10",
+      "name": "IEC 60068-2-78",
+      "url": "https://webstore.iec.ch/en/publication/109062",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-11",
+      "name": "IEC 60529",
+      "url": "https://webstore.iec.ch/en/publication/2447",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-12",
+      "name": "ISTA",
+      "url": "https://www.ista.org/test_procedures.php",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-13",
+      "name": "DNV-CG-0339",
+      "url": "https://store.accuristech.com/standards/dnv-dnv-cg-0339?product_id=2842682",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-13b",
+      "name": "IEC 60945",
+      "url": "https://webstore.iec.ch/en/publication/3959",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-14",
+      "name": "IACS E10",
+      "url": "https://iacs.org.uk/resolutions/unified-requirements/ur-e/",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-15",
+      "name": "EN 50155",
+      "url": "https://knowledge.bsigroup.com/products/railway-applications-rolling-stock-electronic-equipment-1/standard",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-16",
+      "name": "IEC 61373",
+      "url": "https://webstore.iec.ch/en/publication/5395",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-17",
+      "name": "IEC 61850-3",
+      "url": "https://webstore.iec.ch/en/publication/6010",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-18a",
+      "name": "IEC 60255-21-1",
+      "url": "https://webstore.iec.ch/en/publication/1167",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-18b",
+      "name": "IEC 60255-21-2",
+      "url": "https://webstore.iec.ch/en/publication/1168",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-18c",
+      "name": "IEC 60255-21-3",
+      "url": "https://webstore.iec.ch/en/publication/1169",
+      "status": "OK",
+      "issues": []
+    },
+    {
+      "id": "std-19",
+      "name": "IEEE 1613",
+      "url": "https://standards.ieee.org/ieee/1613/10454/",
+      "status": "OK",
+      "issues": []
+    }
+  ]
+}
