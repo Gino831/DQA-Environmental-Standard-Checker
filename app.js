@@ -47,7 +47,12 @@ async function syncToDataJs(standardsData, actionMessage) {
         }
     } catch (syncError) {
         console.warn('[SYNC] 無法同步到 data.js:', syncError);
-        // 靜默失敗，資料已保存在 localStorage
+        // GitHub Pages 模式下無法同步，資料僅存在 localStorage
+        // 提示使用者（僅第一次）
+        if (!window._syncWarningShown) {
+            window._syncWarningShown = true;
+            console.info('[INFO] 您目前使用 GitHub Pages 靜態模式，變更僅存在瀏覽器 localStorage。');
+        }
     }
 }
 
@@ -327,11 +332,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let count = 0;
         let totalCostTWD = 0;
 
-        // Exchange rates (2026-01-08)
+        // Exchange rates (last updated: 2026-01-08, source: manual)
+        // Note: Rates are static. Update periodically for accuracy.
         const RATES = {
-            CHF: 39.60,
-            USD: 31.47,
-            GBP: 39.80  // Added GBP for EN 50155 (BSI Knowledge)
+            CHF: 39.60,   // Swiss Franc -> TWD
+            USD: 31.47,   // US Dollar -> TWD
+            GBP: 39.80    // British Pound -> TWD
         };
 
         standards.forEach(std => {
@@ -363,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalCostEl) {
             // Format as NT$ X,XXX
             const formattedCost = Math.round(totalCostTWD).toLocaleString();
-            totalCostEl.textContent = `NT$ ${formattedCost} (Est.)`;
+            totalCostEl.textContent = `NT$ ${formattedCost} (Est. @2026-01)`;
         }
     }
 
@@ -372,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusClass = expired ? 'status-expired' : 'status-valid';
         const statusText = expired ? 'Expired' : 'Valid';
         const revisionSummary = std.revisionSummary || 'No revision summary available.';
-        const searchUrl = getSearchUrl(std.name);
+        const searchUrl = std.sourceUrl || getSearchUrl(std.name);
 
         detailsContent.innerHTML = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
