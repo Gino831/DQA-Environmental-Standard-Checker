@@ -7,6 +7,90 @@ import json
 
 PORT = 8001
 
+
+class DQAHandler(http.server.SimpleHTTPRequestHandler):
+    def do_POST(self):
+        if self.path == '/api/run-verify':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+
+            try:
+                print("Running verify_standards.py...")
+                print("-" * 50)
+                result = subprocess.run(
+                    ['python', '-u', 'verify_standards.py'],
+                    text=True
+                )
+                print("-" * 50)
+
+                if result.returncode == 0:
+                    response = {'status': 'success', 'message': 'Verification complete'}
+                else:
+                    response = {'status': 'error', 'message': 'Script failed'}
+            except Exception as e:
+                response = {'status': 'error', 'message': str(e)}
+
+            self.wfile.write(json.dumps(response).encode())
+
+        elif self.path == '/api/sync-data':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                standards = json.loads(post_data.decode('utf-8'))
+
+                # Write data.js for frontend
+                js_content = "console.log('Data.js loading...');\n"
+                js_content += "window.initialStandards = "
+                js_content += json.dumps(standards, indent=4, ensure_ascii=False)
+                js_content += ";\n"
+
+                with open('data.js', 'w', encoding='utf-8') as f:
+                    f.write(js_content)
+
+                # Also write standards.json for Python scraper (optimized data source)
+                with open('standards.json', 'w', encoding='utf-8') as f:
+                    json.dump(standards, f, indent=2, ensure_ascii=False)
+
+                print(f"[SYNC] Updated data.js + standards.json with {len(standards)} standards")
+                response = {'status': 'success', 'message': f'Synced {len(standards)} standards'}
+            except Exception as e:
+                print(f"[SYNC ERROR] {str(e)}")
+                response = {'status': 'error', 'message': str(e)}
+
+            self.wfile.write(json.dumps(response).encode())
+
+        else:
+            self.send_error(404)
+
+
+print(f"Starting DQA Server at http://localhost:{PORT}")
+print("--------------------------------------------------")
+print("  Server is RUNNING. Please KEEP THIS WINDOW OPEN.")
+print("  You can minimize this window, but do not close it.")
+print("--------------------------------------------------")
+print("Press Ctrl+C to stop.")
+
+# Auto-open browser
+webbrowser.open(f"http://localhost:{PORT}")
+
+with socketserver.TCPServer(("", PORT), DQAHandler) as httpd:
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer stopped.")import http.server
+import socketserver
+import webbrowser
+import os
+import subprocess
+import json
+
+PORT = 8001
+
 class DQAHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/api/run-verify':
