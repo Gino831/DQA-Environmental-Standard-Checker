@@ -1,4 +1,65 @@
-# 定時執行爬蟲驗證標準版本
+# Scheduled scraper verification workflow
+# Periodically checks all standards for latest versions
+
+name: "🔄 定時爬蟲驗證"
+
+on:
+  # Weekly on Monday 9 AM (UTC+8)
+  schedule:
+    - cron: '0 1 * * 1'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+  # When data.js or standards.json is pushed
+  push:
+    paths:
+      - 'data.js'
+      - 'standards.json'
+
+# Write permission for pushing updated results
+permissions:
+  contents: write
+
+jobs:
+  verify-standards:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: "🐍 Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      # 3. Setup Chrome (required by Selenium)
+      - name: "🌐 Setup Chrome"
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 'stable'
+
+      # 4. Install Python dependencies
+      - name: "📦 Install dependencies"
+        run: pip install -r requirements.txt
+
+      # 5. Run scraper verification
+      - name: "🔍 Run verification"
+        run: python verify_standards.py
+
+      # 6. Push results back to repo
+      - name: "📤 Commit & push results"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add verification_results.json
+          # Only commit if there are changes
+          git diff --staged --quiet || git commit -m "🔄 自動更新驗證結果 $(date +'%Y-%m-%d %H:%M')"
+          git push# 定時執行爬蟲驗證標準版本
 # 此工作流程會定期檢查所有法規標準的最新版本
 
 name: 🔄 定時爬蟲驗證
