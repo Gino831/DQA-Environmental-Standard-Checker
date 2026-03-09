@@ -1,82 +1,24 @@
 # Scheduled scraper verification workflow
-# Periodically checks all standards for latest versions
+# 定時爬蟲驗證工作流程 - 定期檢查所有法規標準的最新版本
 
 name: "🔄 定時爬蟲驗證"
 
 on:
-  # Weekly on Monday 9 AM (UTC+8)
+  # Weekly on Monday 9 AM (UTC+8) = 1 AM UTC
+  # 每週一早上 9 點 (UTC+8) 自動執行
   schedule:
     - cron: '0 1 * * 1'
 
-  # Allow manual trigger
+  # Allow manual trigger / 允許手動觸發
   workflow_dispatch:
 
-  # When data.js or standards.json is pushed
+  # When data sources are pushed / 當資料來源被推送時也執行
   push:
     paths:
       - 'data.js'
       - 'standards.json'
 
 # Write permission for pushing updated results
-permissions:
-  contents: write
-
-jobs:
-  verify-standards:
-    runs-on: ubuntu-latest
-
-    steps:
-      # 1. Checkout repository
-      - name: "📥 Checkout repository"
-        uses: actions/checkout@v4
-
-      # 2. Setup Python
-      - name: "🐍 Setup Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
-
-      # 3. Setup Chrome (required by Selenium)
-      - name: "🌐 Setup Chrome"
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: 'stable'
-
-      # 4. Install Python dependencies
-      - name: "📦 Install dependencies"
-        run: pip install -r requirements.txt
-
-      # 5. Run scraper verification
-      - name: "🔍 Run verification"
-        run: python verify_standards.py
-
-      # 6. Push results back to repo
-      - name: "📤 Commit & push results"
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add verification_results.json
-          # Only commit if there are changes
-          git diff --staged --quiet || git commit -m "🔄 自動更新驗證結果 $(date +'%Y-%m-%d %H:%M')"
-          git push# 定時執行爬蟲驗證標準版本
-# 此工作流程會定期檢查所有法規標準的最新版本
-
-name: 🔄 定時爬蟲驗證
-
-on:
-  # 每週一早上 9 點 (UTC+8) 自動執行
-  schedule:
-    - cron: '0 1 * * 1'
-  
-  # 允許手動觸發（從 GitHub Actions 頁面或 API）
-  workflow_dispatch:
-
-  # 當 data.js 被推送時也執行
-  push:
-    paths:
-      - 'data.js'
-
 # 設定寫入權限，允許 Actions 推送更新結果
 permissions:
   contents: write
@@ -84,39 +26,40 @@ permissions:
 jobs:
   verify-standards:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 10
+
     steps:
-      # 1. 拉取程式碼
-      - name: 📥 Checkout repository
+      # 1. Checkout repository / 拉取程式碼
+      - name: "📥 Checkout repository"
         uses: actions/checkout@v4
-      
-      # 2. 設定 Python 環境
-      - name: 🐍 Setup Python
+
+      # 2. Setup Python / 設定 Python 環境
+      - name: "🐍 Setup Python"
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip'
-      
-      # 3. 安裝 Chrome（Selenium 需要）
-      - name: 🌐 Setup Chrome
+
+      # 3. Setup Chrome (required by Selenium) / 安裝 Chrome
+      - name: "🌐 Setup Chrome"
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: 'stable'
 
-      # 4. 安裝 Python 依賴
-      - name: 📦 Install dependencies
+      # 4. Install Python dependencies / 安裝 Python 依賴
+      - name: "📦 Install dependencies"
         run: pip install -r requirements.txt
 
-      # 5. 執行爬蟲驗證
-      - name: 🔍 Run verification
+      # 5. Run scraper verification / 執行爬蟲驗證
+      - name: "🔍 Run verification"
         run: python verify_standards.py
 
-      # 6. 將結果推送回 repo
-      - name: 📤 Commit & push results
+      # 6. Push results back to repo / 將結果推送回 repo
+      - name: "📤 Commit & push results"
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add verification_results.json
-          # 只在有變更時才 commit
+          # Only commit if there are changes / 只在有變更時才 commit
           git diff --staged --quiet || git commit -m "🔄 自動更新驗證結果 $(date +'%Y-%m-%d %H:%M')"
           git push
