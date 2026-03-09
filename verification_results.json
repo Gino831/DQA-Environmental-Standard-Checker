@@ -1,5 +1,13 @@
 {
-  "timestamp": "2026-03-02T03:30:41.516482",
+  "timestamp": "2026-03-09T02:51:20.179938",
+  "total": 25,
+  "summary": {
+    "ok": 23,
+    "mismatch": 2,
+    "error": 0,
+    "skipped": 0,
+    "warning": 0
+  },
   "results": [
     {
       "id": "std-1770091032381",
@@ -7,7 +15,7 @@
       "url": "https://telecom-info.njdepot.ericsson.net/site-cgi/ido/docs.cgi?ID=13515794250D000616&KEYWORDS=Reliability%20Prediction%20Procedures%20&TITLE=&DOCUMENT=&DATE=&CLASS=PS71&COUNT=1000",
       "status": "MISMATCH",
       "issues": [
-        "Version: Local='issue 3' vs Live='Issue 4'"
+        "Edition: Local='issue 3' vs Live='4'"
       ]
     },
     {
@@ -133,8 +141,10 @@
       "id": "std-15",
       "name": "EN 50155",
       "url": "https://knowledge.bsigroup.com/products/railway-applications-rolling-stock-electronic-equipment-1/standard",
-      "status": "OK",
-      "issues": []
+      "status": "MISMATCH",
+      "issues": [
+        "Cost: Local='£488' vs Live='£488.00'"
+      ]
     },
     {
       "id": "std-16",
