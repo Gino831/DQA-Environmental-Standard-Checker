@@ -8,6 +8,24 @@ import os
 import time
 from contextlib import contextmanager
 
+# ── HTTP Request Helper with Retry ──────────────────────────────────
+DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+
+def requests_with_retry(url, max_retries=2, timeout=15):
+    """HTTP GET with retry logic for transient failures."""
+    for attempt in range(max_retries + 1):
+        try:
+            response = requests.get(url, headers=DEFAULT_HEADERS, timeout=timeout)
+            return response
+        except (requests.ConnectionError, requests.Timeout) as e:
+            if attempt < max_retries:
+                wait_time = 2 ** attempt  # exponential backoff: 1s, 2s
+                print(f"  [Retry {attempt+1}/{max_retries}] {e.__class__.__name__}, waiting {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise
+
+
 # Selenium imports
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -16,7 +34,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-# ── Selenium Context Manager ──────────────────────────────────────────
+# ââ Selenium Context Manager ââââââââââââââââââââââââââââââââââââââââââ
 @contextmanager
 def selenium_driver():
     """
@@ -48,7 +66,7 @@ def selenium_driver():
                 pass
 
 
-# ── Data Loading ─────────────────────────────────────────────
+# ââ Data Loading âââââââââââââââââââââââââââââââââââââââââââââ
 def load_standards(base_path):
     """
     Loads standards from standards.json (preferred) or falls back to data.js parsing.
@@ -106,7 +124,7 @@ def _parse_data_js(file_path):
     return standards
 
 
-# ── Scrapers ─────────────────────────────────────────────────
+# ââ Scrapers âââââââââââââââââââââââââââââââââââââââââââââââââ
 def scrape_iec_page(url, driver):
     """Scrapes IEC webstore using Selenium."""
     if not driver:
@@ -167,8 +185,7 @@ def scrape_iec_page(url, driver):
 def scrape_ieee_page(url):
     """Scrapes IEEE page (static) with version comparison."""
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        response = requests.get(url, headers=headers, timeout=15)
+        response = requests_with_retry(url)
         if response.status_code != 200:
             return {'error': f"HTTP {response.status_code}"}
 
@@ -267,8 +284,7 @@ def scrape_bsi_knowledge(url, driver):
 def scrape_smart_generic(url, standard_name):
     """Smart generic scraper - auto-detect version/price info."""
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        response = requests.get(url, headers=headers, timeout=15)
+        response = requests_with_retry(url)
         if response.status_code != 200:
             return {'error': f"HTTP {response.status_code}", 'accessible': False}
 
@@ -306,7 +322,7 @@ def scrape_smart_generic(url, standard_name):
         return {'error': str(e), 'accessible': False}
 
 
-# ── Unified Verification Logic ───────────────────────────────────
+# ââ Unified Verification Logic âââââââââââââââââââââââââââââââââââ
 def verify_standard_logic(std, live_data):
     """
     Unified comparison logic for all scraper types.
@@ -359,7 +375,7 @@ def verify_standard_logic(std, live_data):
     return issues
 
 
-# ── Main Verification ────────────────────────────────────────
+# ââ Main Verification ââââââââââââââââââââââââââââââââââââââââ
 def run_verification(base_path):
     """Main entry point for verification."""
     print("--- DQA Standard Verification Agent (Optimized) ---")
@@ -432,6 +448,10 @@ def run_verification(base_path):
                     print("OK")
 
             json_results.append(result_entry)
+
+        # Rate limiting: brief delay between requests
+        if idx < total:
+            time.sleep(0.5)
 
     # Save report with summary
     json_report = {
