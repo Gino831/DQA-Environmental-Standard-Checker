@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-14T05:47:57.956221",
+  "timestamp": "2026-09-21T05:55:24.419486",
   "total": 25,
   "summary": {
-    "ok": 20,
-    "mismatch": 5,
+    "ok": 19,
+    "mismatch": 6,
     "error": 0,
     "skipped": 0,
     "warning": 0
@@ -22,8 +22,10 @@
       "id": "std-1768206238554",
       "name": "IEC 60721-3-3",
       "url": "https://webstore.iec.ch/en/publication/32620",
-      "status": "OK",
-      "issues": []
+      "status": "MISMATCH",
+      "issues": [
+        "Stability: Local='2027 (Stability)' vs Live='2031'"
+      ]
     },
     {
       "id": "std-1768268975228",
